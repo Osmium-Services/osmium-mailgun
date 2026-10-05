@@ -1,0 +1,55 @@
+{
+    "id": "mailgun",
+    "name": "Mailgun",
+    "version": "1.0.0",
+    "description": "Send site email through Mailgun's HTTP API - useful where hosting blocks outbound SMTP. Appears as a provider on the Email settings page.",
+    "category": "other",
+    "author": {
+        "name": "Gavin Cox"
+    },
+    "license": "proprietary",
+
+    "requires": {
+        "osmium": ">=1.0.0",
+        "php": ">=8.1",
+        "services": []
+    },
+
+    "autoload": [
+        "models"
+    ],
+
+    "admin": {
+        "menu": {
+            "section": "Content",
+            "items": [
+                {
+                    "id": "mailgun",
+                    "label": "Mailgun",
+                    "icon": "bx bx-envelope",
+                    "route": "admin/settings/mailgun",
+                    "activePattern": "admin/settings/mailgun",
+                    "role": null
+                }
+            ]
+        },
+        "routes": {
+            "admin/settings/mailgun": {
+                "controller": "controllers/MailgunController.php",
+                "class": "Osmium\\Services\\Mailgun\\Controllers\\MailgunController",
+                "method": "index",
+                "title": "Mailgun"
+            }
+        }
+    },
+
+    "hooks": {
+        "mail.providers": [
+            "Osmium\\Services\\Mailgun\\Models\\MailgunMailProvider::provider"
+        ]
+    },
+
+    "setup": {
+        "postInstallNote": "Enter the sending domain, region and API key on the Mailgun settings page, then choose Mailgun as the Provider on Settings > Email and use Send test email."
+    }
+}

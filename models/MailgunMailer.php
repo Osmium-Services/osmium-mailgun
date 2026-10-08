@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Osmium\Services\Mailgun\Models;
 
-use Osmium\Core\Library\MailerInterface;
+use Osmium\Core\Library\PlainTextMailer;
 
 /**
  * Sends mail via the Mailgun HTTP API, for sites on hosting that blocks
@@ -15,7 +15,7 @@ use Osmium\Core\Library\MailerInterface;
  * From address and name; the domain, region and API key come from this
  * service's own config.
  */
-class MailgunMailer implements MailerInterface
+class MailgunMailer implements PlainTextMailer
 {
     private const US_BASE_URL = 'https://api.mailgun.net/v3/%s/messages';
     private const EU_BASE_URL = 'https://api.mailgun.eu/v3/%s/messages';
@@ -26,10 +26,15 @@ class MailgunMailer implements MailerInterface
      * @param array<int, array{email: string, name?: string}> $recipients
      * @return array{success: bool, error?: string}
      */
-    public function send(array $recipients, string $subject, string $htmlBody): array
+    public function send(array $recipients, string $subject, string $htmlBody, ?string $textBody = null): array
     {
         try {
-            $this->postMessage($recipients, $subject, $htmlBody);
+            $this->postMessage(
+                recipients: $recipients,
+                subject: $subject,
+                htmlBody: $htmlBody,
+                textBody: $textBody,
+            );
             return ['success' => true];
         } catch (\Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
@@ -39,7 +44,7 @@ class MailgunMailer implements MailerInterface
     /**
      * @param array<int, array{email: string, name?: string}> $recipients
      */
-    private function postMessage(array $recipients, string $subject, string $htmlBody): void
+    private function postMessage(array $recipients, string $subject, string $htmlBody, ?string $textBody): void
     {
         $mailgun = MailgunConfig::get();
 
@@ -60,15 +65,19 @@ class MailgunMailer implements MailerInterface
             $recipients,
         ));
 
+        $fields = [
+            'from' => $from,
+            'to' => $to,
+            'subject' => $subject,
+            'html' => $htmlBody,
+        ];
+        $hasText = $textBody !== null;
+        if ($hasText) $fields['text'] = $textBody;
+
         $ch = \curl_init($url);
         \curl_setopt_array($ch, [
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => [
-                'from' => $from,
-                'to' => $to,
-                'subject' => $subject,
-                'html' => $htmlBody,
-            ],
+            CURLOPT_POSTFIELDS => $fields,
             CURLOPT_USERPWD => 'api:' . $mailgun->apiKey,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,

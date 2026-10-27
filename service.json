@@ -1,10 +1,11 @@
 {
     "id": "mailgun",
     "name": "Mailgun",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "description": "Send site email through Mailgun's HTTP API - useful where hosting blocks outbound SMTP. Appears as a provider on the Email settings page.",
     "category": "email",
     "website": "https://www.mailgun.com",
+    "account": {"required": "free", "note": "Free plan available; paid plans for higher volume."},
     "author": {
         "name": "Gavin Cox"
     },

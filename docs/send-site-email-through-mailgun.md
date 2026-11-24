@@ -1,6 +1,7 @@
 ---
 title: Send your site's email through Mailgun
 tags: email, mailgun, mail provider, smtp, sending, deliverability
+page: admin/settings/mailgun
 ---
 
 **Mailgun** sends your site's email, such as order confirmations and sign-in codes, through Mailgun's service instead of SMTP. It is useful where your hosting blocks outbound SMTP.
